@@ -1,19 +1,19 @@
 # Virtual Environment
-venv/
-env/
 myenv/
 
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
 
 # Django
 db.sqlite3
-*.log
 
-# Environment variables
+# Environment Variables
 .env
 
 # VS Code
 .vscode/
+
+# Static/Media
+staticfiles/
+media/
