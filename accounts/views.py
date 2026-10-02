@@ -1,3 +1,4 @@
+from django.core import paginator
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,7 +16,9 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from .models import Profile, Department, Designation, Attendance, Leave
 from django.contrib.auth.password_validation import validate_password
-
+from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
+from django.utils import timezone
 
 # Create your views here.
 
@@ -144,27 +147,69 @@ class UserListView(APIView):
                 "role":user.profile.role,
             })   
         return Response(data,status=status.HTTP_200_OK)    
+
+# for pagination 
+class EmployeePagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 50
     
+class AttendancePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50   
+
+class LeavePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50     
+        
 class EmployeeListView(APIView):
     permission_classes = [IsAdminOrHR]
     
     def get(self, request):
-        employee = User.objects.filter(profile__role='employee')
-        data = []   
-        for user in employee:
+        search = request.query_params.get('search')
+        department = request.query_params.get('department')
+        designation = request.query_params.get('designation')
+        
+        employee = User.objects.filter(profile__role='employee').order_by('id')
+        
+        if search:
+            employee = employee.filter(
+                Q(username__icontains=search) |
+                Q(email__icontains=search) |
+                Q(profile__name__icontains=search)
+            )
+        
+        if department:
+            employee = employee.filter(
+                Q(profile__department__name__icontains = department)
+            )    
+        
+        if designation:
+            employee = employee.filter(
+                Q(profile__designation__name__icontains=designation)
+            )
+        
+        # for pagination of the page      
+        paginator = EmployeePagination()
+        page = paginator.paginate_queryset(employee, request)   
+                      
+        data = []
+        for user in page:
             data.append({
-                "id":user.id,
-                "username":user.username,
+                "id": user.id,
+                "username": user.username,
                 "name":user.profile.name,
-                "email":user.email,
-                "role":user.profile.role,
-                "department":user.profile.department.name
+                "email": user.email,
+                "role": user.profile.role,
+                "department": user.profile.department.name
                     if user.profile.department else None,
-                "designation":user.profile.designation.name
-                    if user.profile.designation else None,
-            })
-        return Response(data,status=status.HTTP_200_OK)         
- 
+                "designation": user.profile.designation.name
+                    if user.profile.designation else None,    
+                    })
+        return paginator.get_paginated_response(data)
+               
 class CreateEmployeeView(APIView):
     permission_classes = [IsAdminOrHR]
     
@@ -554,9 +599,31 @@ class AttendanceView(APIView):
     permission_classes = [IsAdminOrHR]
     
     def get(self, request):
-        attendance = Attendance.objects.all()
-        serializer = AttendanceSerializer(attendance, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        employee = request.query_params.get('employee')
+        date = request.query_params.get('date')
+        attendance_status = request.query_params.get('status')
+        
+        attendance = Attendance.objects.all().order_by('id')
+        
+        # Filter by employee username
+        if employee:
+            attendance = attendance.filter(employee__username__icontains=employee)
+        
+        # Filter by date
+        if date:
+            attendance = attendance.filter(date=date)
+        
+        # Filter by attendance status
+        if attendance_status:
+            attendance = attendance.filter(status = attendance_status)
+        
+        #Pagination
+        paginator = AttendancePagination()
+        page = paginator.paginate_queryset(attendance, request)
+                    
+        serializer = AttendanceSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     def post(self, request):
         serializer = AttendanceSerializer(data= request.data)
@@ -603,6 +670,37 @@ class AttendanceDetailView(APIView):
 class LeaveView(APIView):
     permission_classes = [IsAuthenticated]
     
+    def get(self, request):
+        role = request.user.profile.role
+        
+        status_filter = request.query_params.get('status')
+        employee = request.query_params.get('employee')
+        
+        if role == 'employee':
+            leaves = Leave.objects.filter(employee= request.user)
+        elif role in ['hr', 'admin']:
+            leaves = Leave.objects.all()
+        else:
+            return Response({"error":"Invalid role"}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Filter by status
+        if status_filter:
+            leaves = leaves.filter(status=status_filter)
+        
+        # Filter by employee username (only for HR and Admin)
+        if employee:
+            leaves = leaves.filter(employee__username__icontains=employee)
+        
+        leaves = leaves.order_by('id')
+        
+        paginator = LeavePagination()
+        page = paginator.paginate_queryset(leaves,request)
+
+                
+        serializer = LeaveSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)        
+        
+    
     def post(self, request):
         serializer = LeaveSerializer(data=request.data)
         if serializer.is_valid():
@@ -611,7 +709,138 @@ class LeaveView(APIView):
                              "data":serializer.data}, status= status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                              
                                      
-                
-                   
+class LeaveStatusView(APIView):
+    permission_classes = [IsAdminOrHR]
+    
+    def get(self, request, pk):
+        
+        try:
+            leave = Leave.objects.get(id=pk)
+        except Leave.DoesNotExist:
+            return Response({"error":"Leave not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        new_status = request.data.get('status')
+        
+        if new_status not in ['approved', 'rejected']:
+            return Response({"error":"Status must be approved or rejected"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        leave.status = new_status
+        leave.save()
+        return Response({"message":f"Leave {new_status} successfully",
+                         "data": LeaveSerializer(leave).data}, status=status.HTTP_200_OK)
+   
+class LeaveDetailView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        try:
+            leave = Leave.objects.get(id=pk)
+        except Leave.DoesNotExist:
+            return Response({"error":"Leave not found"}, status= status.HTTP_404_NOT_FOUND)
+        
+        # Employee can see only their own leave 
+        if request.user.profile.role == 'employee':
+            if leave.employee != request.user:
+                return Response({"error":"You can access only own leave"}, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = LeaveSerializer(leave) 
+        return Response(serializer.data, status=status.HTTP_200_OK)      
+    
+    def patch(self, request, pk):
+        try:
+            leave = Leave.objects.get(id=pk)
+        except Leave.DoesNotExist:
+            return Response({"error":"Leave not Found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # employee can update only their own leave
+        if request.user.profile.role == 'employee':
+            if leave.employee != request.user:
+                return Response({"error":"You can update only their own leave"},status=status.HTTP_403_FORBIDDEN)
+        
+        # only pending leave can be updated 
+        if leave.status != 'pending':
+            return Response({"error":"Only pending leave can be updated"},status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = LeaveSerializer(leave, data = request.data, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"Leave updated successfully",
+                             "data": serializer.data}, status= status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+                       
+    def delete(self, request, pk):
+        try:
+            leave = Leave.objects.get(id=pk)
+        except Leave.DoesNotExist:
+            return Response({"error":"Leave not found"},status=status.HTTP_404_NOT_FOUND)
+        
+        #Employee can delete only thier own leave
+        if request.user.profile.role == 'employee':
+            if leave.employee != request.user:
+                return Response({"error":"You can delete only thier own leave"}, status=status.HTTP_403_FORBIDDEN)
+        
+        #Only pending leave can be deleted
+        if leave.status != 'pending':
+            return Response({"error":"Only pending leave can be deleted"}, status =status.HTTP_400_BAD_REQUEST)
+        
+        leave.delete()
+        return Response({"message":"Leave deleted successfully"}, status=status.HTTP_204_NO_CONTENT)   
+                                     
+class HRDashboardView(APIView):
+    permission_classes = [IsAdminOrHR]
+    
+    def get(self, request):
+        total_employees = User.objects.filter(profile__role='employee').count()
+        
+        total_departments = Department.objects.count()
+        
+        today = timezone.now().date() 
+        
+        today_present = Attendance.objects.filter(date=today, status='present').count()
+        
+        today_absent = Attendance.objects.filter(date=today, status='absent').count()
+        
+        total_today_attendance = today_present + today_absent
+
+        if total_today_attendance > 0:
+            attendance_percentage = (today_present / total_today_attendance) * 100
+        else:
+            attendance_percentage = 0
+            
+        pending_leaves = Leave.objects.filter(status='pending').count()
+        
+        approved_leaves = Leave.objects.filter(status='approved').count()
+        
+        rejected_leaves = Leave.objects.filter(status='rejected').count()
+        
+        # Department-wise employee count
+        department_data = []
+
+        departments = Department.objects.all()
+
+        for department in departments:
+            employee_count = User.objects.filter(profile__role='employee',profile__department=department).count()
+
+            department_data.append({
+                "department": department.name,
+                "employees": employee_count
+            })
+            
+        return Response({
+            "total_employees": total_employees,
+            "total_departments": total_departments,
+            "today_attendance": {
+                "present": today_present,
+                "absent": today_absent,
+                "attendance_percentage": round(attendance_percentage, 2)
+            },
+            "leaves": {
+                "pending": pending_leaves,
+                "approved": approved_leaves,
+                "rejected": rejected_leaves
+            },
+            "department_wise_employees": department_data
+        }, status = status.HTTP_200_OK)                  
                          
                 

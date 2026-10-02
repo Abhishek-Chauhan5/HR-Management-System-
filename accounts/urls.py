@@ -3,7 +3,8 @@ from .views import (ProfileView, RegisterView, LoginView, ProfileView, Dashboard
                     UserListView, EmployeeListView, EmployeeDetailview, AdminUserDetailsView,
                     AdminPasswordChangeView,ChangeOwnpasswordView, LogoutView, ForgetPasswordView,
                     ResetPasswordView, CreateEmployeeView, DepartmentView, DesignationView,
-                    AttendanceView, AttendanceDetailView)
+                    AttendanceView, AttendanceDetailView, LeaveView, LeaveStatusView,
+                    LeaveDetailView,HRDashboardView)
 
 urlpatterns = [
     path('register/',RegisterView.as_view()),
@@ -24,4 +25,8 @@ urlpatterns = [
     path('designations/', DesignationView.as_view()),
     path('attendance/', AttendanceView.as_view()),
     path('attendance/<int:pk>/', AttendanceDetailView.as_view()),
+    path('leaves/', LeaveView.as_view()),
+    path('leaves/<int:pk>/status/', LeaveStatusView.as_view()),
+    path('leaves/<int:pk>/', LeaveDetailView.as_view()),
+    path('dashboard/hr/', HRDashboardView.as_view()),
 ]
