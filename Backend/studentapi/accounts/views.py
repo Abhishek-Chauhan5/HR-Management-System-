@@ -82,37 +82,70 @@ class ProfileView(APIView):
                         "role":user.profile.role})        
            
             
-
-class DashboardView(APIView):  
+class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
-    
-    def get(self,request):
-        
+
+    def get(self, request):
+
         role = request.user.profile.role
         
+        today = timezone.now().date()
+
+        total_employees = Profile.objects.filter(
+            role='employee'
+        ).count()
+
+        present_today = Attendance.objects.filter(
+            date=today,
+            status='present'
+        ).count()
+
+        on_leave = Attendance.objects.filter(
+            date=today,
+            status='leave'
+        ).count()
+
+        pending_leaves = Leave.objects.filter(
+            status='pending'
+        ).count()
+
         if role == 'admin':
             return Response({
-                "message":"Welcome Admin",
-                "role":"admin",
-                "access":"You can access all the data",
-            }) 
-        
+                "message": "Welcome Admin",
+                "role": "admin",
+                "access": "You can access all the data",
+                "total_employees": total_employees,
+                "present_today": present_today,
+                "on_leave": on_leave,
+                "pending_leaves": pending_leaves,
+            })
+
         elif role == 'hr':
             return Response({
-                "message":"Welcome HR",
-                "role":"hr",
-                "access":"You can access employee and HR data",
-            })     
-          
+                "message": "Welcome HR",
+                "role": "hr",
+                "access": "You can access employee and HR data",
+                "total_employees": total_employees,
+                "present_today": present_today,
+                "on_leave": on_leave,
+                "pending_leaves": pending_leaves,
+            })
+
         elif role == 'employee':
             return Response({
-                "message":"Welcome Employee",
-                "role":"employee",
-                "access":"You can access your own data",
-            })    
-        
-        return Response({
-            "message":"Invalid Role"}, status = status.HTTP_403_FORBIDDEN)    
+                "message": "Welcome Employee",
+                "role": "employee",
+                "access": "You can access your own data",
+                "total_employees": total_employees,
+                "present_today": present_today,
+                "on_leave": on_leave,
+                "pending_leaves": pending_leaves,
+            })
+
+        return Response(
+            {"message": "Invalid Role"},
+            status=status.HTTP_403_FORBIDDEN
+        )    
   
 class UserListView(APIView):
     permission_classes = [IsAuthenticated]

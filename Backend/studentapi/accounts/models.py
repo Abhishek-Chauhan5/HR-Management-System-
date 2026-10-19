@@ -39,7 +39,7 @@ class Designation(models.Model):
 class Attendance(models.Model):
     STATUS_CHOICE = (
         ('present', 'PRESENT'),
-        ('adsent', 'ABSENT'),
+        ('absent', 'ABSENT'),
         ('leave', 'LEAVE')
     )
     

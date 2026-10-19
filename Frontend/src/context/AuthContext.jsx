@@ -8,10 +8,19 @@ export function AuthProvider({children}) {
     );
 
     const login = (accessToken, refreshToken) => {
-        localStorage.setItem("access_token", accessToken);
-        localStorage.setItem("refresh_token", refreshToken);
-        setIsAuthenticated(true);
-    };
+    console.log("Login function called");
+    console.log("Access Token:", accessToken);
+
+    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem("refresh_token", refreshToken);
+
+    console.log(
+        "Stored Token:",
+        localStorage.getItem("access_token")
+    );
+
+    setIsAuthenticated(true);
+};
 
     const logout = () => {
         localStorage.removeItem("access_token");
