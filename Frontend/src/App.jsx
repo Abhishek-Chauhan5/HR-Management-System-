@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Employees from "./pages/Employees";
 import Departments from "./pages/Departments";
+import Attendance from "./pages/Attendance";
+import LeaveManagement from "./pages/LeaveManagement";
 
 function App() {
     return (
@@ -15,6 +17,8 @@ function App() {
                     </ProtectedRoute>} />
                 <Route path="/employees" element={<Employees />} />    
                 <Route path="/departments" element={<Departments />} />
+                <Route path="/attendance" element={<Attendance />} />
+                <Route path="/leave-management" element={<LeaveManagement />} />
             </Routes>
                 
         </BrowserRouter>

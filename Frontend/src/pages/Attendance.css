@@ -1,0 +1,308 @@
+
+/* =========================================
+   HR MANAGEMENT SYSTEM - ATTENDANCE
+   Theme matched with Employees.css
+========================================= */
+
+/* Main Page */
+.attendance-page {
+    min-height: 100vh;
+    padding: 36px 40px;
+    background: #f5f7fb;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111827;
+    box-sizing: border-box;
+}
+
+.attendance-page *,
+.attendance-page *::before,
+.attendance-page *::after {
+    box-sizing: border-box;
+}
+
+/* Header */
+.attendance-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 22px 26px;
+    margin-bottom: 28px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #334155 0%, #166534 100%);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.attendance-header::before,
+.attendance-header::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.attendance-header::before {
+    width: 85px;
+    height: 85px;
+    right: 85px;
+    bottom: -60px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.attendance-header::after {
+    width: 150px;
+    height: 150px;
+    right: -45px;
+    top: -80px;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.attendance-header h1 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.attendance-header p {
+    position: relative;
+    z-index: 1;
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Attendance Form */
+.attendance-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 24px;
+    margin-bottom: 28px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.attendance-form input,
+.attendance-form select {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    outline: none;
+    background: #ffffff;
+    color: #111827;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.attendance-form input::placeholder {
+    color: #94a3b8;
+}
+
+.attendance-form input:focus,
+.attendance-form select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Mark Attendance Button */
+.attendance-form button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(110deg, #166534, #15803d);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(22, 101, 52, 0.14);
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.attendance-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(22, 101, 52, 0.2);
+}
+
+.attendance-form button:active {
+    transform: translateY(0);
+}
+
+/* Table Container */
+.attendance-table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.25s ease,
+                border-color 0.25s ease;
+}
+
+.attendance-table-container:hover {
+    border-color: #dbe3ef;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+/* Attendance Table */
+.attendance-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+/* Table Header */
+.attendance-table thead th {
+    padding: 17px 16px;
+    background: linear-gradient(
+        135deg,
+        #1e293b 0%,
+        #334155 65%,
+        #166534 100%
+    );
+    color: #ffffff;
+    border-bottom: 2px solid #166534;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+}
+
+.attendance-table thead th:first-child {
+    border-top-left-radius: 13px;
+}
+
+.attendance-table thead th:last-child {
+    border-top-right-radius: 13px;
+}
+
+/* Table Cells */
+.attendance-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #334155;
+    font-size: 14px;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+/* Alternate Row Colors */
+.attendance-table tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+.attendance-table tbody tr:nth-child(even) {
+    background: #f0f5f1;
+}
+
+.attendance-table tbody tr:hover {
+    background: #e0eee4;
+}
+
+.attendance-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Empty State */
+.attendance-table tbody tr td[colspan="4"] {
+    padding: 35px 16px;
+    color: #64748b;
+    text-align: center;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+    .attendance-page {
+        padding: 30px 25px;
+    }
+
+    .attendance-form {
+        gap: 12px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .attendance-page {
+        padding: 25px 18px;
+    }
+
+    .attendance-header {
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .attendance-header h1 {
+        font-size: 26px;
+    }
+
+    .attendance-form {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 18px;
+    }
+
+    .attendance-form input,
+    .attendance-form select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .attendance-form button {
+        width: 100%;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+        padding: 13px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 450px) {
+    .attendance-page {
+        padding: 20px 14px;
+    }
+
+    .attendance-header h1 {
+        font-size: 24px;
+    }
+}
+
+/*back button css*/
+.attendance-back-button {
+    position: relative;
+    z-index: 2;
+    padding: 10px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.attendance-back-button:hover {
+    transform: translateY(-2px);
+}

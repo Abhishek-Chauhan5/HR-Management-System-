@@ -108,9 +108,13 @@ function Dashboard() {
                             Departments
                         </li>
 
-                        <li>Attendance</li>
+                        <li onClick={() => navigate("/attendance")}>
+                            Attendance
+                        </li>
 
-                        <li>Leave Management</li>
+                        <li onClick={() => navigate("/leave-management")}>
+                            Leave Management
+                        </li>
 
                     </ul>
 
