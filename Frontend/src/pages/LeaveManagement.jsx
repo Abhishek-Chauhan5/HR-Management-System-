@@ -11,6 +11,15 @@ function LeaveManagement() {
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
     const [reason, setReason] = useState("");
+    const handleLeaveStatus = (id, newStatus) => {
+    setLeaves((previous) =>
+        previous.map((leave) =>
+            leave.id === id
+                ? { ...leave, status: newStatus }
+                : leave
+        )
+    );
+};
 
     const handleApplyLeave = (e) => {
         e.preventDefault();
@@ -122,6 +131,7 @@ function LeaveManagement() {
                             <th>To</th>
                             <th>Reason</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
 
@@ -135,16 +145,37 @@ function LeaveManagement() {
                                 <td>{leave.toDate}</td>
                                 <td>{leave.reason}</td>
                                 <td>
-                                    <span className="leave-status">
-                                        {leave.status}
-                                    </span>
-                                </td>
+    <span className={`leave-status ${leave.status.toLowerCase()}`}>
+        {leave.status}
+    </span>
+</td>
+<td>
+    {leave.status === "Pending" && (
+        <>
+            <button
+                type="button"
+                className="leave-approve-button"
+                onClick={() => handleLeaveStatus(leave.id, "Approved")}
+            >
+                Approve
+            </button>
+
+            <button
+                type="button"
+                className="leave-reject-button"
+                onClick={() => handleLeaveStatus(leave.id, "Rejected")}
+            >
+                Reject
+            </button>
+        </>
+    )}
+</td>
                             </tr>
                         ))}
 
                         {leaves.length === 0 && (
                             <tr>
-                                <td colSpan="7">
+                                <td colSpan="8">
                                     No leave requests available.
                                 </td>
                             </tr>

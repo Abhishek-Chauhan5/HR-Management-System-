@@ -271,3 +271,41 @@
         font-size: 24px;
     }
 }
+
+.leave-approve-button,
+.leave-reject-button {
+    padding: 7px 11px;
+    margin: 3px;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.leave-approve-button {
+    background: #15803d;
+}
+
+.leave-approve-button:hover {
+    background: #166534;
+}
+
+.leave-reject-button {
+    background: #dc2626;
+}
+
+.leave-reject-button:hover {
+    background: #b91c1c;
+}
+
+.leave-status.approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.leave-status.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
