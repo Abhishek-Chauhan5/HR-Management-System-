@@ -118,4 +118,4 @@ class LeaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leave
         fields = '__all__'
-        read_only_fields = ['status']  # Make the status field read-only for employees        
+        read_only_fields = ['status']  # Make the employee field read-only for employees

@@ -161,7 +161,7 @@
 
 .leave-table {
     width: 100%;
-    min-width: 850px;
+    min-width: 1000px;
     border-collapse: collapse;
     text-align: left;
 }
@@ -207,13 +207,14 @@
     border-bottom: none;
 }
 
-.leave-table tbody tr td[colspan="7"] {
+/* Empty and Loading Rows */
+.leave-table tbody tr td[colspan="8"] {
     padding: 35px 16px;
     color: #64748b;
     text-align: center;
 }
 
-/* Pending Status */
+/* Status Badges */
 .leave-status {
     display: inline-block;
     padding: 6px 12px;
@@ -222,6 +223,71 @@
     color: #92400e;
     font-size: 12px;
     font-weight: 700;
+    white-space: nowrap;
+}
+
+.leave-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.leave-status.approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.leave-status.rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Approve and Reject Buttons */
+.leave-approve-button,
+.leave-reject-button {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 3px;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.leave-approve-button {
+    background: #15803d;
+}
+
+.leave-approve-button:hover {
+    background: #166534;
+    transform: translateY(-1px);
+}
+
+.leave-reject-button {
+    background: #dc2626;
+}
+
+.leave-reject-button:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.leave-approve-button:disabled,
+.leave-reject-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* No Actions Message */
+.leave-no-action {
+    color: #64748b;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 /* Responsive Design */
@@ -238,6 +304,7 @@
 
     .leave-header {
         padding: 20px;
+        border-radius: 12px;
     }
 
     .leave-header h1 {
@@ -260,6 +327,10 @@
     .leave-form button {
         width: 100%;
     }
+
+    .leave-table {
+        min-width: 1000px;
+    }
 }
 
 @media (max-width: 450px) {
@@ -270,42 +341,4 @@
     .leave-header h1 {
         font-size: 24px;
     }
-}
-
-.leave-approve-button,
-.leave-reject-button {
-    padding: 7px 11px;
-    margin: 3px;
-    border: none;
-    border-radius: 6px;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.leave-approve-button {
-    background: #15803d;
-}
-
-.leave-approve-button:hover {
-    background: #166534;
-}
-
-.leave-reject-button {
-    background: #dc2626;
-}
-
-.leave-reject-button:hover {
-    background: #b91c1c;
-}
-
-.leave-status.approved {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.leave-status.rejected {
-    background: #fee2e2;
-    color: #991b1b;
 }
